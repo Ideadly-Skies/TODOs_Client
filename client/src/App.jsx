@@ -26,6 +26,12 @@ function App() {
     }
   }
 
+  // compute completed and total todos
+  const todos_completed = todos.filter(
+    (todo) => todo.completed === true
+  ).length;
+  const total_todos = todos.length; 
+
   useEffect(() => {
     fetchTodos()
   }, [])
@@ -39,7 +45,7 @@ function App() {
     <>
       <div className='wrapper'>
         <Header />
-        <TODOHero todos_completed={0} total_todos={0}/>
+        <TODOHero todos_completed={todos_completed} total_todos={total_todos}/>
         <Form todos={todos} setTodos={setTodos} setCurrentPage={setCurrentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE}/>
         <TODOList todos={currentTodos} setTodos={setTodos} currentPage={currentPage} setCurrentPage={setCurrentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE}/>
 

@@ -30,7 +30,7 @@ function Form({ todos, setTodos, setCurrentPage, ITEMS_PER_PAGE }) {
     const value = event.target.todo.value;
     const newTodo = {
       todo: value,
-      id: todos.length > 0 ? String(parseInt(todos[todos.length - 1].id) + 1) : 1,
+      id: todos.length > 0 ? String(parseInt(todos[todos.length - 1].id) + 1) : "1",
       completed: false,
       userId: todos.length > 0 ? todos[todos.length - 1].userId : 1,
     };
