@@ -1,14 +1,22 @@
-import './App.css'
+import './App.css';
+
+import Header from './components/Header';
+import Form from './components/Form';
+import TODOList from './components/TodoList';
+import TODOHero from './components/TODOHero';
 
 function App() {
 
   return (
     <>
-      <h1 class="text-3xl font-bold underline">
-        Hello world!
-      </h1> 
+      <div className='wrapper'>
+        <Header />
+        <TODOHero todos_completed={0} total_todos={0}/>
+        <Form />
+        <TODOList todos={[]} />
+      </div> 
     </>
-  )
+  );
 }
 
-export default App
+export default App;
