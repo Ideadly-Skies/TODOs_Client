@@ -1,4 +1,5 @@
 import React from "react";
+import { useRef, useState, useEffect } from "react";
 
 function TODOList({ todos, setTodos }) {
   return (
@@ -15,32 +16,98 @@ function TODOList({ todos, setTodos }) {
 }
 
 function Item({ item, todos, setTodos }) {
-  const [editing, setEditing] = React.useState(false);
-  const inputRef = React.useRef(null);
+  const [editing, setEditing] = useState(false);
+  const inputRef = useRef(null);
+  
+  async function deleteTodoServer(id){
+    try {
+      const url = `http://localhost:3000/todos/${id}`
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        } 
+      })
 
-  const completeTodo = () => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === item.id
-          ? { ...todo, is_completed: !todo.is_completed }
-          : todo
-      )
-    );
+      if (!response.ok){
+        throw new Error(`Response status: ${response.status}`)
+      }
 
-    // Update localStorage after marking todo as completed
-    const updatedTodos = JSON.stringify(todos);
-    localStorage.setItem("todos", updatedTodos);
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+
+  async function persistTodoEdit(id, value){
+    try {
+      const url = `http://localhost:3000/todos/${id}`
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'todo': value ,
+        }) 
+      })
+
+      if (!response.ok){
+        throw new Error(`Response status: ${response.status}`)
+      }
+
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+
+  async function completeTodoServer(id, item){
+    try {
+      const url = `http://localhost:3000/todos/${id}`
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'completed': !item.completed,
+        }) 
+      })
+
+      if (!response.ok){
+        throw new Error(`Response status: ${response.status}`)
+      }
+
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+
+  const completeTodo = async () => {
+    try {
+      await completeTodoServer(item.id, item)
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === item.id
+            ? { ...todo, completed: !todo.completed }
+            : todo
+        )
+      );
+
+    } catch (error){
+      console.log(error.message)
+    }
+
   };
 
   const handleEdit = () => {
     setEditing(true);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (editing && inputRef.current) {
       inputRef.current.focus();
 
-      // position the cursor at the end of the text
+      // position the curs or at the end of the text
       inputRef.current.setSelectionRange(
         inputRef.current.value.length,
         inputRef.current.value.length
@@ -48,40 +115,35 @@ function Item({ item, todos, setTodos }) {
     }
   }, [editing]);
 
-  const handleInputChange = (e) => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === item.id ? { ...todo, title: e.target.value } : todo
-      )
-    );
+  const handleInputChange = async (e) => {
+    try {
+      await persistTodoEdit(item.id, e.target.value);
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === item.id ? { ...todo, todo: e.target.value } : todo
+        )
+      );
+    } catch (error) {
+      console.log(error.message)
+    }
   };
 
   const handleInpuSubmit = (event) => {
     event.preventDefault();
-
-    // Update localStorage after editing todo
-    const updatedTodos = JSON.stringify(todos);
-    localStorage.setItem("todos", updatedTodos);
-
     setEditing(false);
   };
 
   const handleInputBlur = () => {
-    // Update localStorage after editing todo
-    const updatedTodos = JSON.stringify(todos);
-    localStorage.setItem("todos", updatedTodos);
-
     setEditing(false);
   };
 
-  const handleDelete = () => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== item.id));
-
-    // Update localStorage after deleting todo
-    const updatedTodos = JSON.stringify(
-      todos.filter((todo) => todo.id !== item.id)
-    );
-    localStorage.setItem("todos", updatedTodos);
+  const handleDelete = async () => {
+    try {
+      await deleteTodoServer(item.id);
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== item.id));
+    } catch (error) {
+      console.error(error.message);
+    }  
   };
 
   return (
@@ -94,7 +156,7 @@ function Item({ item, todos, setTodos }) {
               type="text"
               name="edit-todo"
               id="edit-todo"
-              defaultValue={item?.title}
+              defaultValue={item?.todo}
               onBlur={handleInputBlur}
               onChange={handleInputChange}
             />
@@ -113,16 +175,16 @@ function Item({ item, todos, setTodos }) {
               width={34}
               height={34}
               stroke="#22C55E"
-              fill={item.is_completed ? "#22C55E" : "#0d0d0d"}
+              fill={item.completed ? "#22C55E" : "#0d0d0d"}
             >
               <circle cx="11.998" cy="11.998" fillRule="nonzero" r="9.998" />
             </svg>
             <p
               style={
-                item.is_completed ? { textDecoration: "line-through" } : {}
+                item.completed ? { textDecoration: "line-through" } : {}
               }
             >
-              {item?.title}
+              {item?.todo}
             </p>
           </button>
           <div className="todo_items_right">

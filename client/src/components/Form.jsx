@@ -1,20 +1,49 @@
 function Form({ todos, setTodos }) {
-  const handleSubmit = (event) => {
+  async function addTodo({newTodo}){
+    try {
+      const url = `http://localhost:3000/todos`
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'id': newTodo.id,
+          'todo': newTodo.todo,
+          'completed': newTodo.completed,
+          'userId': newTodo.userId,
+        }) 
+      })
+
+      if (!response.ok){
+        throw new Error(`Response status: ${response.status}`)
+      }
+
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+  
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const value = event.target.todo.value;
     const newTodo = {
-      title: value,
-      id: self.crypto.randomUUID(),
-      is_completed: false,
+      todo: value,
+      id: todos.length > 0 ? todos[todos.length - 1].id : 1,
+      completed: false,
+      userId: todos.length > 0 ? todos[todos.length - 1].userId : 1,
     };
+    
+    try {
+      // persist to do in json server
+      await addTodo({ newTodo });
 
-    setTodos((prevTodos) => [...prevTodos, newTodo]);
-
-    const updatedTodoList = JSON.stringify([...todos, newTodo]);
-    localStorage.setItem("todos", updatedTodoList);
-
-    event.target.reset();
+      setTodos((prevTodos) => [...prevTodos, newTodo]);
+      event.target.reset();
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   return (
