@@ -28,7 +28,7 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
   
   async function deleteTodoServer(id){
     try {
-      const url = `http://localhost:3000/todos/${id}`
+      const url = `https://todos-json-server-sandy.vercel.app/todos/${id}`
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -47,7 +47,7 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
 
   async function persistTodoEdit(id, value){
     try {
-      const url = `http://localhost:3000/todos/${id}`
+      const url = `https://todos-json-server-sandy.vercel.app/todos/${id}`
       const response = await fetch(url, {
         method: 'PATCH',
         headers: {
@@ -69,7 +69,7 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
 
   async function completeTodoServer(id, item){
     try {
-      const url = `http://localhost:3000/todos/${id}`
+      const url = `https://todos-json-server-sandy.vercel.app/todos/${id}`
       const response = await fetch(url, {
         method: 'PATCH',
         headers: {

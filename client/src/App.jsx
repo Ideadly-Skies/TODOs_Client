@@ -12,7 +12,7 @@ function App() {
   const ITEMS_PER_PAGE = 4;
 
   async function fetchTodos() {
-    let url = `http://localhost:3000/todos`;
+    let url = `https://todos-json-server-sandy.vercel.app/todos`;
     try {
       const response = await fetch(url)
       if (!response.ok){

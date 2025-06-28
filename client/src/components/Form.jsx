@@ -1,7 +1,7 @@
 function Form({ todos, setTodos, setCurrentPage, ITEMS_PER_PAGE }) {
   async function addTodo({newTodo}){
     try {
-      const url = `http://localhost:3000/todos`
+      const url = `https://todos-json-server-sandy.vercel.app/todos`
       const response = await fetch(url, {
         method: 'POST',
         headers: {
