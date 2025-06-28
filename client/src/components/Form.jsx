@@ -1,4 +1,4 @@
-function Form({ todos, setTodos }) {
+function Form({ todos, setTodos, setCurrentPage, ITEMS_PER_PAGE }) {
   async function addTodo({newTodo}){
     try {
       const url = `http://localhost:3000/todos`
@@ -30,7 +30,7 @@ function Form({ todos, setTodos }) {
     const value = event.target.todo.value;
     const newTodo = {
       todo: value,
-      id: todos.length > 0 ? todos[todos.length - 1].id : 1,
+      id: todos.length > 0 ? String(parseInt(todos[todos.length - 1].id) + 1) : 1,
       completed: false,
       userId: todos.length > 0 ? todos[todos.length - 1].userId : 1,
     };
@@ -39,7 +39,12 @@ function Form({ todos, setTodos }) {
       // persist to do in json server
       await addTodo({ newTodo });
 
-      setTodos((prevTodos) => [...prevTodos, newTodo]);
+      setTodos((prevTodos) => {
+        const updated = [...prevTodos, newTodo];
+        setCurrentPage(Math.ceil(updated.length / ITEMS_PER_PAGE));
+        return updated;
+      }); 
+      
       event.target.reset();
     } catch (error) {
       console.error(error.message);

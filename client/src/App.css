@@ -186,3 +186,22 @@ header {
 .todo_items_right button svg {
   fill: #c2b39a;
 }
+
+/* pagination */
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button {
+  background-color: #1f2937;
+  color: white;
+  border: 1px solid #c2b39a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover:enabled {
+  background-color: #374151;
+}

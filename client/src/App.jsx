@@ -8,6 +8,8 @@ import { useState, useEffect } from 'react';
 
 function App() {
   const [todos, setTodos] = useState([])
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 4;
 
   async function fetchTodos() {
     let url = `http://localhost:3000/todos`;
@@ -28,13 +30,37 @@ function App() {
     fetchTodos()
   }, [])
   
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentTodos = todos.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(todos.length / ITEMS_PER_PAGE);
+
   return (
     <>
       <div className='wrapper'>
         <Header />
         <TODOHero todos_completed={0} total_todos={0}/>
-        <Form todos={todos} setTodos={setTodos}/>
-        <TODOList todos={todos} setTodos={setTodos} />
+        <Form todos={todos} setTodos={setTodos} setCurrentPage={setCurrentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE}/>
+        <TODOList todos={currentTodos} setTodos={setTodos} currentPage={currentPage} setCurrentPage={setCurrentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE}/>
+
+        {/* Pagination Controls */}
+        <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+          >
+            Previous
+          </button>
+          <span style={{ color: 'white' }}>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+          >
+            Next
+          </button>
+        </div>
       </div> 
     </>
   );

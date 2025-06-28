@@ -1,12 +1,19 @@
 import React from "react";
 import { useRef, useState, useEffect } from "react";
 
-function TODOList({ todos, setTodos }) {
+function TODOList({ todos, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
   return (
     <ol className="todo_list">
       {todos && todos.length > 0 ? (
-        todos?.map((item, index) => (
-          <Item key={index} item={item} todos={todos} setTodos={setTodos} />
+        todos.map((item, index) => (
+          <Item
+            key={index}
+            item={item}
+            setTodos={setTodos}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            ITEMS_PER_PAGE={ITEMS_PER_PAGE}
+          />
         ))
       ) : (
         <p>Seems lonely in here, what are you up to?</p>
@@ -15,7 +22,7 @@ function TODOList({ todos, setTodos }) {
   );
 }
 
-function Item({ item, todos, setTodos }) {
+function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
   const [editing, setEditing] = useState(false);
   const inputRef = useRef(null);
   
@@ -140,11 +147,22 @@ function Item({ item, todos, setTodos }) {
   const handleDelete = async () => {
     try {
       await deleteTodoServer(item.id);
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== item.id));
+
+      setTodos((prevTodos) => {
+        const updatedTodos = prevTodos.filter((todo) => todo.id !== item.id);
+        const remainingItemsOnPage = updatedTodos.length - (currentPage - 1) * ITEMS_PER_PAGE;
+
+        if (remainingItemsOnPage === 0 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+
+        return updatedTodos;
+      });
     } catch (error) {
       console.error(error.message);
-    }  
+    }
   };
+
 
   return (
     <li id={item?.id} className="todo_item">
