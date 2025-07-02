@@ -25,6 +25,7 @@ function TODOList({ todos, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE
 
 function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
   const [editing, setEditing] = useState(false);
+  const [editedText, setEditedText] = useState(item.todo);
   const inputRef = useRef(null);
   
   async function deleteTodoServer(id){
@@ -99,33 +100,36 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
     }
 
   };
-  
-  const handleInputChange = async (e) => {
-    await persistTodoEdit(item.id, e.target.value);
-    
+
+  const persistAndCloseEdit = async () => {
+    setEditing(false);
+
+    if (editedText.trim() === item.todo.trim()) return;
+
+    await persistTodoEdit(item.id, editedText);
+
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
-        todo.id === item.id ? { ...todo, todo: e.target.value } : todo
+        todo.id === item.id ? { ...todo, todo: editedText } : todo
       )
     );
-    
-    // newTodo successfully edited 
+
     Swal.fire({
       position: "top-middle",
       icon: "success",
-      title: `todo ${item.id} edited!`,
+      title: `Todo ${item.id} edited!`,
       showConfirmButton: false,
-      timer: 1500
-    }); 
+      timer: 1500,
+    });
   };
 
   const handleInpuSubmit = (event) => {
     event.preventDefault();
-    setEditing(false);
+    persistAndCloseEdit();
   };
 
   const handleInputBlur = () => {
-    setEditing(false);
+    persistAndCloseEdit();
   };
 
   const handleDelete = async () => {
@@ -184,9 +188,9 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
                 type="text"
                 name="edit-todo"
                 id="edit-todo"
-                defaultValue={item?.todo}
+                value={editedText}
                 onBlur={handleInputBlur}
-                onChange={handleInputChange}
+                onChange={(e) => setEditedText(e.target.value)}
               />
             </label>
           </form>
