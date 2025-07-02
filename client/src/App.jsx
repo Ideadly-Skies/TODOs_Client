@@ -5,6 +5,7 @@ import Form from './components/Form';
 import TODOList from './components/TODOList';
 import TODOHero from './components/TODOHero';
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2'
 
 function App() {
   const [todos, setTodos] = useState([])
@@ -12,7 +13,7 @@ function App() {
   const ITEMS_PER_PAGE = 4;
 
   async function fetchTodos() {
-    let url = `https://todos-json-server-sandy.vercel.app/todos`;
+    let url = `https://delightful-zigzag-banon.glitch.me/todos`;
     try {
       const response = await fetch(url)
       if (!response.ok){
@@ -22,7 +23,11 @@ function App() {
       const json = await response.json()
       setTodos(json)
     } catch (error){
-      console.error(error.message)
+      Swal.fire({
+        icon: "error",
+        title: `${error.message}`,
+        text: "Please resolve fetch issues at App.jsx",
+      });
     }
   }
 

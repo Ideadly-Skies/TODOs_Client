@@ -1,27 +1,21 @@
+import Swal from 'sweetalert2'
+
 function Form({ todos, setTodos, setCurrentPage, ITEMS_PER_PAGE }) {
   async function addTodo({newTodo}){
-    try {
-      const url = `https://todos-json-server-sandy.vercel.app/todos`
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'id': newTodo.id,
-          'todo': newTodo.todo,
-          'completed': newTodo.completed,
-          'userId': newTodo.userId,
-        }) 
-      })
-
-      if (!response.ok){
-        throw new Error(`Response status: ${response.status}`)
-      }
-
-    } catch (error) {
-      console.error(error.message)
-    }
+    const url = `https://delightful-zigzag-banon.glitch.me/todos`
+    
+    return await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'id': newTodo.id,
+        'todo': newTodo.todo,
+        'completed': newTodo.completed,
+        'userId': newTodo.userId,
+      }) 
+    })
   }
   
   const handleSubmit = async (event) => {
@@ -36,19 +30,37 @@ function Form({ todos, setTodos, setCurrentPage, ITEMS_PER_PAGE }) {
     };
     
     try {
-      // persist to do in json server
-      await addTodo({ newTodo });
+      const response = await addTodo({ newTodo });
+
+      if (!response.ok){
+        throw new Error(`Response status: ${response.status}`)
+      }
 
       setTodos((prevTodos) => {
         const updated = [...prevTodos, newTodo];
         setCurrentPage(Math.ceil(updated.length / ITEMS_PER_PAGE));
         return updated;
-      }); 
+      });
       
+      // adding newTodo succeeded 
+      Swal.fire({
+        position: "top-middle",
+        icon: "success",
+        title: `todo ${newTodo.id} added!`,
+        showConfirmButton: false,
+        timer: 1500
+      }); 
+  
       event.target.reset();
     } catch (error) {
-      console.error(error.message);
-    }
+      // adding newTodo failed 
+      Swal.fire({
+        icon: "error",
+        title: `${error.message}`,
+        text: `error adding todo ${newTodo.id}`,
+      }); 
+    }    
+
   };
 
   return (
