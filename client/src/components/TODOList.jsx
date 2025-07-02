@@ -155,7 +155,7 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
         
         Swal.fire({
           title: "Deleted!",
-          text: "Your file has been deleted.",
+          text: `Todo ${item.id} successfully deleted!`, 
           icon: "success"
         });
       }
