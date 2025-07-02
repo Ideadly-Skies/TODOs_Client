@@ -106,21 +106,42 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
 
     if (editedText.trim() === item.todo.trim()) return;
 
-    await persistTodoEdit(item.id, editedText);
-
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === item.id ? { ...todo, todo: editedText } : todo
-      )
-    );
-
+    // show loading 
     Swal.fire({
-      position: "top-middle",
-      icon: "success",
-      title: `Todo ${item.id} edited!`,
-      showConfirmButton: false,
-      timer: 1500,
+      title: 'Saving...',
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false
     });
+
+    try {
+      await persistTodoEdit(item.id, editedText);
+
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === item.id ? { ...todo, todo: editedText } : todo
+        )
+      );
+
+      // editing succeeded 
+      Swal.fire({
+        position: "top-middle",
+        icon: "success",
+        title: `Todo ${item.id} edited!`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (err) {
+      // editing failed
+      Swal.fire({
+        icon: "error",
+        title: "Failed to update",
+        text: "Something went wrong.",
+      });
+    }
   };
 
   const handleInpuSubmit = (event) => {
