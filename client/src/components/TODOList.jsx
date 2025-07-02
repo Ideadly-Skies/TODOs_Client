@@ -199,6 +199,12 @@ function Item({ item, setTodos, currentPage, setCurrentPage, ITEMS_PER_PAGE }) {
     }
   }, [editing]);
 
+  useEffect(() => {
+    if (editing) {
+      setEditedText(item.todo);
+    }
+  }, [editing, item.todo]);
+
   return (
     <li id={item?.id} className="todo_item">
         {editing ? (
